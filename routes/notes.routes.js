@@ -30,16 +30,22 @@ noteRouter.post("/add", async (req, res) => {
 noteRouter.patch("/update/:noteId", async (req, res) => {
   const token = req.headers.authorization.split(" ")[1];
   const decoded = jwt.verify(token, "ball");
-  const noteID = req.params.noteId;
+  // const noteID = req.params.noteId;
   const req_id = decoded.userID;
-  const note = await NoteModel.findOne({ _id: noteID });
-  const userID_in_note = note.userID;
-  const { noteId } = req.params;
+  // const note = await NoteModel.findOne({ _id: noteID });
+  // const userID_in_note = note.userID;
+  // const { noteId } = req.params;
   try {
-    if (req_id == userID_in_note) {
-      const note = await NoteModel.findByIdAndUpdate(noteId, req.body);
-      res.status(200).send({ msg: "Note has been Updated" });
+    const note=await NoteModel.findById(req.params.id)
+    if(!note){
+      res.send("note not found")
     }
+    if (req_id!==req.noteId){
+      res.send("Not Authorized")
+    }
+      const updatenote = await NoteModel.findByIdAndUpdate(req.params.id, req.body);
+      res.status(200).send({ msg: "Note has been Updated" });
+    
   } catch (err) {
     res.status(400).send({ msg: err.msg });
   }
